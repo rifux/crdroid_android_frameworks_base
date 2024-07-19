@@ -29,6 +29,7 @@ import static android.view.Display.DEFAULT_DISPLAY;
 import static android.view.RemoteAnimationTarget.MODE_OPENING;
 import static android.view.WindowManager.LayoutParams.TYPE_DOCK_DIVIDER;
 import static android.view.WindowManager.TRANSIT_CHANGE;
+import static android.view.WindowManager.TRANSIT_CLOSE;
 import static android.view.WindowManager.TRANSIT_KEYGUARD_OCCLUDE;
 import static android.view.WindowManager.TRANSIT_TO_BACK;
 import static android.view.WindowManager.TRANSIT_TO_FRONT;
@@ -2777,7 +2778,7 @@ public class StageCoordinator implements SplitLayout.SplitLayoutHandler,
                                 + " with " + taskInfo.taskId + " before startAnimation().");
                         record.addRecord(stage, true, taskInfo.taskId);
                     }
-                } else if (isClosingType(change.getMode())) {
+                } else if (change.getMode() == TRANSIT_CLOSE) {
                     if (stage.containsTask(taskInfo.taskId)) {
                         record.addRecord(stage, false, taskInfo.taskId);
                         Log.w(TAG, "Expected onTaskVanished on " + stage + " to have been called"
@@ -3532,8 +3533,9 @@ public class StageCoordinator implements SplitLayout.SplitLayoutHandler,
                 clearSplitPairedInRecents(EXIT_REASON_APP_DOES_NOT_SUPPORT_MULTIWINDOW);
                 mSplitTransitions.startDismissTransition(wct, StageCoordinator.this, stageType,
                         EXIT_REASON_APP_DOES_NOT_SUPPORT_MULTIWINDOW);
-                Log.w(TAG, splitFailureMessage("onNoLongerSupportMultiWindow",
-                        "app package " + taskInfo.baseActivity.getPackageName()
+                Log.w(TAG, splitFailureMessage("onNoLongerSupportMultiWindow", "app package "
+                        + ((taskInfo != null && taskInfo.baseActivity != null)
+                        ? taskInfo.baseActivity.getPackageName() : "null")
                         + " does not support splitscreen, or is a controlled activity type"));
                 if (splitScreenVisible) {
                     mSplitUnsupportedToast.show();
